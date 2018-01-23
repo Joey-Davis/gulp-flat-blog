@@ -5,6 +5,8 @@ var File = require('vinyl');
 var path = require('path');
 var hljs = require('highlight.js');
 
+var pageIndex = [];
+
 var markdownit = require('markdown-it')({
   highlight: function(str, lang) {
     if (lang && hljs.getLanguage(lang)) {
@@ -53,7 +55,7 @@ function gulpFlatBlog(templates) {
         post.slug = file.relative.substring(0, file.relative.lastIndexOf('.'));
       }
 
-      file.contents = new Buffer(templates.single(post));
+      file.contents = new Buffer(templates.single({post: post, index: pageIndex}));
       file.path = path.join(file.base, post.slug + '.html');
 
       post.createdAt = file.stat.birthtime;
@@ -73,6 +75,12 @@ function gulpFlatBlog(templates) {
     var file = new File({
       path: 'index.html'
     });
+    for (i in posts) {
+      if (pageIndex.includes(posts[i])) {
+      } else {
+          pageIndex.push(posts[i]);
+      }
+    }
     file.contents = new Buffer(templates.index({
       posts: posts
     }));
